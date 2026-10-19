@@ -1,0 +1,20 @@
+# Add this as a separate server block; do not replace an existing site.
+# Change server_name, certificate paths, and 8017 only after checking the host.
+server {
+    listen 443 ssl http2;
+    server_name bot-transport.example.ru;
+
+    ssl_certificate /etc/letsencrypt/live/bot-transport.example.ru/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/bot-transport.example.ru/privkey.pem;
+
+    location /webhook/max {
+        proxy_pass http://127.0.0.1:8017;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 35s;
+    }
+}
+
