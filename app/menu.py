@@ -34,6 +34,7 @@ class MenuDocument(BaseModel):
     welcome: str = Field(min_length=1)
     unknown_message: str = Field(min_length=1)
     stale_callback_message: str = Field(min_length=1)
+    start_button: str = Field(min_length=1)
     back_button: str = Field(min_length=1)
     main_menu_button: str = Field(min_length=1)
     main: MenuItem

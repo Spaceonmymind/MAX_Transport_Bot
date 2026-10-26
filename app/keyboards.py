@@ -12,6 +12,10 @@ def link_button(title: str, url: str) -> dict:
     return {"type": "link", "text": title, "url": url}
 
 
+def start_keyboard(tree: MenuTree) -> list[dict]:
+    return [{"type": "inline_keyboard", "payload": {"buttons": [[callback_button(tree.document.start_button, "go:main")]]}}]
+
+
 def keyboard_for(item: MenuItem, tree: MenuTree) -> list[dict]:
     rows: list[list[dict]] = []
     if item.type == "submenu":

@@ -28,7 +28,17 @@ def handler():
 async def test_commands_show_main_menu(handler, command):
     await handler.handle({"update_type": "message_created", "user": {"user_id": 7}, "message": {"body": {"text": command}}})
     assert handler.api.messages[-1][0] == {"user_id": 7}
-    assert "Расписание" in handler.api.messages[-1][2][0]["payload"]["buttons"][0][0]["text"]
+    if command == "/start":
+        assert handler.api.messages[-1][2][0]["payload"]["buttons"][0][0]["text"] == "Начать"
+    else:
+        assert "Расписание" in handler.api.messages[-1][2][0]["payload"]["buttons"][0][0]["text"]
+
+
+@pytest.mark.asyncio
+async def test_bot_started_shows_welcome_with_start_button(handler):
+    await handler.handle({"update_type": "bot_started", "user": {"user_id": 7}})
+    assert handler.api.messages[-1][1] == handler.menu.document.welcome
+    assert handler.api.messages[-1][2][0]["payload"]["buttons"][0][0]["text"] == "Начать"
 
 
 @pytest.mark.asyncio

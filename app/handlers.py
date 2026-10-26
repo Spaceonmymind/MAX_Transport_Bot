@@ -1,7 +1,7 @@
 import logging
 from typing import Any
 
-from app.keyboards import BACK_ID, MAIN_ID, keyboard_for
+from app.keyboards import BACK_ID, MAIN_ID, keyboard_for, start_keyboard
 from app.max_api import MaxApi, MaxApiError
 from app.menu import MenuTree
 
@@ -18,13 +18,16 @@ class UpdateHandler:
         if kind == "bot_started":
             recipient = self._recipient(update)
             if recipient:
-                await self._show("main", recipient, welcome=True)
+                await self._show_welcome(recipient)
         elif kind == "message_created":
             recipient = self._recipient(update)
             text = self._message_text(update)
             if recipient:
                 if text in {"/start", "/menu"}:
-                    await self._show("main", recipient, welcome=text == "/start")
+                    if text == "/start":
+                        await self._show_welcome(recipient)
+                    else:
+                        await self._show("main", recipient)
                 else:
                     await self.api.send_message(recipient, self.menu.document.unknown_message, keyboard_for(self.menu.document.main, self.menu))
         elif kind == "message_callback":
@@ -62,6 +65,9 @@ class UpdateHandler:
         assert item is not None
         text = self.menu.document.welcome if welcome else (item.text or item.title)
         await self.api.send_message(recipient, text, keyboard_for(item, self.menu))
+
+    async def _show_welcome(self, recipient: dict[str, int]) -> None:
+        await self.api.send_message(recipient, self.menu.document.welcome, start_keyboard(self.menu))
 
     @staticmethod
     def _message_text(update: dict[str, Any]) -> str:
