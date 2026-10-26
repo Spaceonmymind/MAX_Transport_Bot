@@ -77,10 +77,23 @@ class UpdateHandler:
 
     @staticmethod
     def _recipient(update: dict[str, Any]) -> dict[str, int] | None:
+        message = update.get("message") or {}
+        sender = message.get("sender") or {}
         user = update.get("user") or {}
+
+        if isinstance(sender.get("user_id"), int):
+            return {"user_id": sender["user_id"]}
+
         if isinstance(user.get("user_id"), int):
             return {"user_id": user["user_id"]}
+
+        if isinstance(message.get("recipient"), dict):
+            chat_id = message["recipient"].get("chat_id")
+            if isinstance(chat_id, int):
+                return {"chat_id": chat_id}
+
         if isinstance(update.get("chat_id"), int):
             return {"chat_id": update["chat_id"]}
+
         return None
 
